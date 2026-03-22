@@ -6,6 +6,9 @@ class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
+    phone: Optional[str] = None
+    farm_location: Optional[str] = None
+    role: Optional[str] = "user"
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -14,11 +17,13 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: str
 
 class UserResponse(BaseModel):
     id: str
     name: str
     email: EmailStr
+    role: str
 
 # --- ADMIN SCHEMAS ---
 class GuideCreate(BaseModel):

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import api from '../api/api';
 import { ShieldCheck, Plus, CheckCircle } from 'lucide-react';
 
 const Admin = () => {
@@ -18,14 +18,12 @@ const Admin = () => {
   const handleGuideSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:8005/api/admin/guides', guideData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/admin/guides', guideData);
       setSuccessMsg('Guide added successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
       setGuideData({crop: '', soil_preparation: '', seed_selection: '', irrigation_method: '', fertilizer_usage: '', pest_control: '', harvesting_time: ''});
     } catch (err) {
+      console.error(err);
       alert('Error adding guide. Check if you have admin rights.');
     }
   };
@@ -33,14 +31,12 @@ const Admin = () => {
   const handleAlertSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:8005/api/admin/alerts', alertData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/admin/alerts', alertData);
       setSuccessMsg('Alert added successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
       setAlertData({type: '', severity: 'Medium', message: ''});
     } catch (err) {
+      console.error(err);
       alert('Error adding alert. Check if you have admin rights.');
     }
   };

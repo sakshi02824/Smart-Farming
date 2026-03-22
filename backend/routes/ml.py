@@ -12,6 +12,9 @@ class CropPredictionRequest(BaseModel):
     rainfall: float
     soil_type: str
     ph_value: float
+    N: float = 0.0
+    P: float = 0.0
+    K: float = 0.0
 
 class CropPredictionResponse(BaseModel):
     recommended_crop: str
@@ -67,18 +70,21 @@ async def recommend_crop(req: CropPredictionRequest, request: Request, current_u
     else:
         try:
             soil_encoded = SOIL_TYPE_MAPPING.get(req.soil_type.lower(), 2) # default to loamy
-            features = [[req.temperature, req.humidity, req.rainfall, soil_encoded, req.ph_value]]
+            # Features order must match training: N, P, K, temperature, humidity, rainfall, soil_type, ph_value
+            features = [[req.N, req.P, req.K, req.temperature, req.humidity, req.rainfall, soil_encoded, req.ph_value]]
             prediction = predictor.predict(features)[0]
             
             # For demonstration, map prediction to typical rules
             season_mapping = {
-                "Rice": "Kharif", "Wheat": "Rabi", "Cotton": "Kharif", "Tea": "Ongoing", "Maize": "Kharif"
+                "rice": "Kharif", "wheat": "Rabi", "maize": "Kharif/Rabi", 
+                "cotton": "Kharif", "tea": "Ongoing", "coffee": "Ongoing",
+                "mungbean": "Summer", "grapes": "Rabi/Spring"
             }
             
             result = {
-                "recommended_crop": prediction,
-                "reason": "Predicted using Random Forest based on inputted climate and soil conditions.",
-                "suitable_season": season_mapping.get(prediction, "Any")
+                "recommended_crop": prediction.capitalize(),
+                "reason": "Predicted using Random Forest based on inputted soil nutrients (N, P, K), climate, and soil pH.",
+                "suitable_season": season_mapping.get(prediction.lower(), "Dependent on Region")
             }
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))

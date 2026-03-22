@@ -1,24 +1,24 @@
 from fastapi import APIRouter, HTTPException, Request, Depends
 from models.schema import GuideCreate, AlertCreate
-from routes.auth import get_current_user
+from routes.auth import get_current_user, get_current_admin
 from datetime import datetime
 
 router = APIRouter()
 
 @router.post("/guides")
-async def create_guide(guide: GuideCreate, request: Request, current_user: str = Depends(get_current_user)):
+async def create_guide(guide: GuideCreate, request: Request, current_user: dict = Depends(get_current_admin)):
     db_guides = request.app.mongodb["farming_guides"]
     guide_data = guide.dict()
-    guide_data["created_by"] = current_user
+    guide_data["created_by"] = current_user.get("email")
     guide_data["timestamp"] = datetime.utcnow()
     await db_guides.insert_one(guide_data)
     return {"message": "Farming guide added successfully"}
 
 @router.post("/alerts")
-async def create_alert(alert: AlertCreate, request: Request, current_user: str = Depends(get_current_user)):
+async def create_alert(alert: AlertCreate, request: Request, current_user: dict = Depends(get_current_admin)):
     db_alerts = request.app.mongodb["alerts"]
     alert_data = alert.dict()
-    alert_data["created_by"] = current_user
+    alert_data["created_by"] = current_user.get("email")
     alert_data["timestamp"] = datetime.utcnow()
     await db_alerts.insert_one(alert_data)
     return {"message": "Alert generated successfully"}

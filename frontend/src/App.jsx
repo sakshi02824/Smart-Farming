@@ -9,6 +9,8 @@ import CropRecommendation from './pages/CropRecommendation';
 import FarmingGuides from './pages/FarmingGuides';
 import Analytics from './pages/Analytics';
 import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -20,11 +22,16 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/weather" element={<WeatherDashboard />} />
-            <Route path="/recommend" element={<CropRecommendation />} />
-            <Route path="/guides" element={<FarmingGuides />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/admin" element={<Admin />} />
+            
+            {/* Protected Routes */}
+            <Route path="/weather" element={<ProtectedRoute><WeatherDashboard /></ProtectedRoute>} />
+            <Route path="/recommend" element={<ProtectedRoute><CropRecommendation /></ProtectedRoute>} />
+            <Route path="/guides" element={<ProtectedRoute><FarmingGuides /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<ProtectedRoute requiresAdmin={true}><Admin /></ProtectedRoute>} />
+            <Route path="/admin/login" element={<AdminLogin />} />
           </Routes>
         </main>
       </div>

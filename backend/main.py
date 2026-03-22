@@ -10,10 +10,31 @@ from config.settings import settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Connect to MongoDB
+    logger.info("Connecting to MongoDB...")
+    try:
+        app.mongodb_client = AsyncIOMotorClient(settings.MONGODB_URL)
+        app.mongodb = app.mongodb_client[settings.DATABASE_NAME]
+        logger.info(f"Successfully connected to MongoDB database: {settings.DATABASE_NAME}")
+    except Exception as e:
+        logger.error(f"Failed to connect to MongoDB: {e}")
+        # In a real app, you might want to exit here
+    
+    yield
+    
+    # Shutdown: Close connection
+    logger.info("Closing MongoDB connection...")
+    app.mongodb_client.close()
+
 app = FastAPI(
     title="Smart Climate-Based Farming Guidance API",
     description="API for crop recommendation, weather forecasts, and administrative alerts.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # CORS Configuration
@@ -30,22 +51,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# MongoDB Connection Event Handlers
-@app.on_event("startup")
-async def startup_db_client():
-    logger.info("Connecting to MongoDB...")
-    try:
-        app.mongodb_client = AsyncIOMotorClient(settings.MONGODB_URL)
-        app.mongodb = app.mongodb_client[settings.DATABASE_NAME]
-        logger.info(f"Successfully connected to MongoDB database: {settings.DATABASE_NAME}")
-    except Exception as e:
-        logger.error(f"Failed to connect to MongoDB: {e}")
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    logger.info("Closing MongoDB connection...")
-    app.mongodb_client.close()
 
 # Include Routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])

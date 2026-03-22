@@ -4,7 +4,7 @@ import api from '../api/api';
 import { motion as Motion } from 'framer-motion';
 import { User, Lock, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
-const Login = () => {
+const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,10 +27,16 @@ const Login = () => {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
+      
+      if (res.data.role !== 'admin') {
+        setError('Unauthorized: Administrative access required.');
+        return;
+      }
+
       localStorage.setItem('token', res.data.access_token);
       localStorage.setItem('role', res.data.role);
       localStorage.setItem('name', res.data.name);
-      navigate('/');
+      navigate('/admin');
     } catch (err) {
       setError(err.response?.data?.detail || 'Invalid credentials. Please try again.');
     } finally {
@@ -51,10 +57,10 @@ const Login = () => {
       >
         <div className="flex flex-col items-center mb-10">
           <div className="w-24 h-24 bg-white p-4 rounded-3xl shadow-xl border border-gray-100 mb-6 flex items-center justify-center">
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+            <ShieldCheck className="w-12 h-12 text-emerald-600" />
           </div>
-          <h2 className="text-4xl font-black text-gray-800 tracking-tight text-center leading-none">Access <span className="text-emerald-600">SmartHarvest</span></h2>
-          <p className="text-gray-500 font-medium mt-2">Precision Agriculture Console</p>
+          <h2 className="text-4xl font-black text-gray-800 tracking-tight text-center leading-none">Admin <span className="text-emerald-600">Login</span></h2>
+          <p className="text-gray-500 font-medium mt-2">Sign in to the control panel</p>
         </div>
 
         {error && (
@@ -71,20 +77,20 @@ const Login = () => {
         <form onSubmit={handleLogin} className="space-y-8">
           <div className="space-y-6">
             <div className="relative">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2 mb-2 block">Enterprise Email</label>
+              <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2 mb-2 block">Admin Email</label>
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors" size={20} />
                 <input 
                   type="email" required
                   className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50/50 border border-gray-200 focus:bg-white focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 transition-all font-bold text-gray-700"
                   value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@smartharvest.com"
+                  placeholder="admin@smartharvest.com"
                 />
               </div>
             </div>
 
             <div className="relative">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2 mb-2 block">Access Code</label>
+              <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2 mb-2 block">Password</label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors" size={20} />
                 <input 
@@ -111,19 +117,15 @@ const Login = () => {
             disabled={loading}
             className="w-full gradient-leaf text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-emerald-900/20 hover:shadow-emerald-900/40 transition-all flex items-center justify-center disabled:opacity-50"
           >
-            {loading ? 'Decrypting...' : 'Execute Login'}
+            {loading ? 'Logging in...' : 'Login as Admin'}
             <ArrowRight className="ml-2" />
           </Motion.button>
         </form>
         
         <div className="mt-10 text-center flex flex-col items-center space-y-4">
-          <p className="text-gray-500 font-medium">
-            New to the ecosystem? <Link to="/register" className="text-emerald-600 font-black hover:text-emerald-500 underline underline-offset-4">Join SmartHarvest</Link>
-          </p>
-          <div className="w-16 h-px bg-gray-200"></div>
-          <Link to="/admin/login" className="flex items-center space-x-2 text-xs font-black text-gray-400 hover:text-emerald-600 uppercase tracking-widest transition-colors group">
-            <ShieldCheck size={14} className="group-hover:scale-110 transition-transform" />
-            <span>Administrator Access</span>
+          <Link to="/login" className="flex items-center space-x-2 text-xs font-black text-gray-400 hover:text-emerald-600 uppercase tracking-widest transition-colors group">
+            <User size={14} className="group-hover:scale-110 transition-transform" />
+            <span>Return to Standard Login</span>
           </Link>
         </div>
       </Motion.div>
@@ -131,4 +133,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AdminLogin;

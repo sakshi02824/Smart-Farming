@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BookOpen, Search, Filter } from 'lucide-react';
+import api from '../api/api';
+import { BookOpen, Search, Sparkles, Navigation, ChevronRight, Info, Sprout } from 'lucide-react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const FarmingGuides = () => {
   const [guides, setGuides] = useState([]);
@@ -8,78 +9,116 @@ const FarmingGuides = () => {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
+    const fetchGuides = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get(`/guides/farming-guide${search ? `?crop=${search}` : ''}`);
+        setGuides(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchGuides();
   }, [search]);
 
-  const fetchGuides = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(`http://localhost:8005/api/guides/farming-guide${search ? `?crop=${search}` : ''}`);
-      setGuides(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="max-w-6xl mx-auto py-8">
-      <div className="flex flex-col md:flex-row justify-between items-end mb-10 border-b border-gray-200 pb-6">
+    <div className="max-w-7xl mx-auto py-12 px-4 space-y-16">
+      <Motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col lg:flex-row lg:items-center justify-between gap-10"
+      >
         <div>
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight flex items-center">
-            <BookOpen className="h-8 w-8 mr-4 text-green-600" /> Farming Guides
+          <span className="inline-block bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border border-emerald-100">
+             Knowledge Repository
+          </span>
+          <h1 className="text-6xl font-black text-gray-800 tracking-tighter leading-none">
+            Cultivation <span className="text-emerald-600">Vault</span>
           </h1>
-          <p className="text-gray-500 mt-3 text-lg">Comprehensive cultivation techniques for optimal yield.</p>
+          <p className="text-gray-500 mt-4 text-xl font-medium">Expert-curated intelligence for high-density agricultural yields.</p>
         </div>
-        <div className="mt-6 md:mt-0 relative w-full md:w-72">
+        
+        <div className="relative group w-full lg:w-96">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
           <input 
             type="text" 
-            placeholder="Search crop..." 
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none shadow-sm"
+            placeholder="Search Intelligence Base..." 
+            className="w-full pl-12 pr-6 py-4 rounded-2xl glass border border-gray-200 focus:bg-white focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 transition-all font-bold shadow-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
         </div>
-      </div>
+      </Motion.div>
 
-      {loading ? (
-        <div className="text-center py-20 text-gray-500">Loading guides...</div>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {guides.map((guide, idx) => (
-            <div key={idx} className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
-              <div className="bg-green-600 text-white p-6 justify-between items-center relative overflow-hidden">
-                <div className="relative z-10 text-2xl font-bold uppercase tracking-wider">{guide.crop}</div>
-                <div className="absolute right-0 top-0 opacity-10 transform scale-150 -translate-y-4">
-                  <BookOpen size={100} />
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <Motion.div key="loader" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-40 space-y-6">
+             <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
+             <p className="text-emerald-600 font-black tracking-widest uppercase text-xs">Accessing Encrypted Knowledge</p>
+          </Motion.div>
+        ) : (
+          <Motion.div 
+            key="grid"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
+          >
+            {guides.length > 0 ? guides.map((guide, idx) => (
+              <Motion.div 
+                key={idx} 
+                whileHover={{ y: -10 }}
+                className="bg-white rounded-[3rem] shadow-2xl border border-gray-100 overflow-hidden flex flex-col group relative"
+              >
+                <div className="gradient-leaf p-10 text-white relative overflow-hidden">
+                  <div className="relative z-10">
+                    <div className="bg-white/20 w-12 h-12 rounded-xl flex items-center justify-center mb-6">
+                       <Sprout size={24} />
+                    </div>
+                    <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-2">{guide.crop}</h2>
+                    <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Growth Protocol v1.4</p>
+                  </div>
+                  <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/2 translate-y-1/2 rotate-12">
+                    <BookOpen size={200} />
+                  </div>
                 </div>
+                
+                <div className="p-8 space-y-6 flex-grow bg-gray-50/50">
+                  <GuideItem label="Soil Prep" content={guide.soil_preparation} icon={<Navigation size={14} className="text-emerald-500" />} />
+                  <GuideItem label="Seed Logic" content={guide.seed_selection} icon={<Sparkles size={14} className="text-emerald-500" />} />
+                  <GuideItem label="Irrigation" content={guide.irrigation_method} icon={<ChevronRight size={14} className="text-emerald-500" />} />
+                  <GuideItem label="Nurture" content={guide.fertilizer_usage} icon={<Info size={14} className="text-emerald-500" />} />
+                </div>
+                
+                <div className="px-8 pb-8 pt-2">
+                   <button className="w-full py-4 rounded-2xl bg-gray-100 text-gray-400 font-black text-xs uppercase tracking-[0.2em] group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-inner">
+                      Expand Full Dossier
+                   </button>
+                </div>
+              </Motion.div>
+            )) : (
+              <div className="lg:col-span-3 py-40 text-center glass rounded-[3rem] border border-gray-100 italic font-bold text-gray-400">
+                 No agricultural patterns found for your search.
               </div>
-              <div className="p-6 space-y-4 flex-grow text-sm text-gray-600 bg-gray-50">
-                <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                  <span className="font-bold text-gray-800 block mb-1">Soil Prep</span>
-                  {guide.soil_preparation}
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                  <span className="font-bold text-gray-800 block mb-1">Seed Select</span>
-                  {guide.seed_selection}
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                  <span className="font-bold text-gray-800 block mb-1">Irrigation</span>
-                  {guide.irrigation_method}
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                  <span className="font-bold text-gray-800 block mb-1">Fertilizer</span>
-                  {guide.fertilizer_usage}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            )}
+          </Motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
+
+const GuideItem = ({ label, content, icon }) => (
+  <div className="relative group/item">
+    <div className="flex items-center gap-2 mb-2">
+       <div className="bg-white p-2 rounded-lg shadow-sm border border-gray-100">{icon}</div>
+       <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</span>
+    </div>
+    <p className="text-sm font-medium text-gray-600 leading-relaxed border-l-2 border-emerald-100 pl-4 py-1 group-hover/item:border-emerald-500 transition-colors">
+      {content}
+    </p>
+  </div>
+);
 
 export default FarmingGuides;
