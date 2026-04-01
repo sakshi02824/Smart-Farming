@@ -5,14 +5,19 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const FarmingGuides = () => {
   const [guides, setGuides] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchGuides = async () => {
+      if (!search.trim()) {
+        setGuides([]);
+        setLoading(false);
+        return;
+      }
       try {
         setLoading(true);
-        const res = await api.get(`/guides/farming-guide${search ? `?crop=${search}` : ''}`);
+        const res = await api.get(`/guides/farming-guide?crop=${search}`);
         setGuides(res.data);
       } catch (err) {
         console.error(err);
@@ -20,7 +25,12 @@ const FarmingGuides = () => {
         setLoading(false);
       }
     };
-    fetchGuides();
+
+    const timeoutId = setTimeout(() => {
+      fetchGuides();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   }, [search]);
 
   return (
@@ -99,7 +109,7 @@ const FarmingGuides = () => {
               </Motion.div>
             )) : (
               <div className="lg:col-span-3 py-40 text-center glass rounded-[3rem] border border-gray-100 italic font-bold text-gray-400">
-                 No agricultural patterns found for your search.
+                 {search.trim() ? "No agricultural patterns found for your search." : "Enter a crop name above to reveal cultivation intelligence."}
               </div>
             )}
           </Motion.div>

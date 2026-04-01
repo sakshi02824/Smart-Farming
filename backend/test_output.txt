@@ -1,0 +1,2 @@
+STATUS CODE: 200
+RESPONSE: {'recommended_crop': 'Tea', 'reason': 'Based on the given metrics (25.0C, 60.0% humidity, 100.0mm rainfall).', 'suitable_season': 'Kharif/Rabi (Mocked)'}

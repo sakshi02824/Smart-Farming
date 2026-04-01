@@ -17,18 +17,18 @@ const CropRecommendation = () => {
     setError('');
     try {
       const res = await api.post('/ml/recommend-crop', {
-        N: parseFloat(formData.N),
-        P: parseFloat(formData.P),
-        K: parseFloat(formData.K),
-        temperature: parseFloat(formData.temperature),
-        humidity: parseFloat(formData.humidity),
-        ph: parseFloat(formData.ph),
-        rainfall: parseFloat(formData.rainfall)
+        N: parseFloat(formData.N) || 0,
+        P: parseFloat(formData.P) || 0,
+        K: parseFloat(formData.K) || 0,
+        temperature: parseFloat(formData.temperature) || 0,
+        humidity: parseFloat(formData.humidity) || 0,
+        ph_value: parseFloat(formData.ph) || 0,
+        rainfall: parseFloat(formData.rainfall) || 0,
+        soil_type: "loamy"
       });
       setResult(res.data);
     } catch (err) {
-      console.error(err);
-      setError('Neural processing failed. Please verify metric convergence.');
+      setError(`Neural processing failed: ${err.response?.data?.detail || err.message}`);
     } finally {
       setLoading(false);
     }

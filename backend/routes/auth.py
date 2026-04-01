@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.security import OAuth2PasswordBearer
-from models.schema import UserCreate, UserLogin, Token
+from models.schema import UserCreate, UserLogin, Token, UserResponse
 from services.auth import get_password_hash, verify_password, create_access_token
 import jwt
 from config.settings import settings
@@ -68,3 +68,9 @@ async def register_user(user: UserCreate, request: Request):
     
     access_token = create_access_token(data={"sub": user.email, "role": user.role})
     return {"message": "User registered successfully", "access_token": access_token, "role": user.role, "name": user.name}
+
+@router.get("/me", response_model=UserResponse)
+async def get_my_profile(current_user: dict = Depends(get_current_user)):
+    user_data = current_user.copy()
+    user_data["id"] = str(user_data["_id"])
+    return user_data

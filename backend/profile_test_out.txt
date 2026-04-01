@@ -1,0 +1,4 @@
+--- Testing Validation & Profile ---
+11-digit phone (Should Fail 422): 422
+10-digit phone (Should Pass 200/400): 200
+Profile Data (Should be 200): 200 - {'id': '69c16af81eca8e840d15a3e4', 'name': 'Jane Test', 'email': 'jane.valid@gmail.com', 'phone': '9123456780', 'farm_location': 'Delhi', 'role': 'user'}

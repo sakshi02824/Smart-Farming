@@ -1,0 +1,4 @@
+--- Testing Backend Validation ---
+Test 1 (Weak Pass): 422 - {'detail': [{'type': 'string_too_short', 'loc': ['body', 'password'], 'msg': 'String should have at least 8 characters', 'input': 'weak', 'ctx': {'min_length': 8}}]}
+Test 2 (Invalid Name): 422 - {'detail': [{'type': 'value_error', 'loc': ['body', 'name'], 'msg': 'Value error, Name must contain only letters and spaces', 'input': 'Invalid123', 'ctx': {'error': {}}}]}
+Test 3 (Invalid Phone): 422 - {'detail': [{'type': 'string_pattern_mismatch', 'loc': ['body', 'phone'], 'msg': "String should match pattern '^\\+?[1-9]\\d{1,14}$'", 'input': 'invalid_phone', 'ctx': {'pattern': '^\\+?[1-9]\\d{1,14}$'}}]}

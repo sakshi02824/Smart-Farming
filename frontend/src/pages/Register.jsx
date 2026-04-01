@@ -4,6 +4,43 @@ import api from '../api/api';
 import { motion as Motion } from 'framer-motion';
 import { User, Mail, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, MapPin, Phone } from 'lucide-react';
 
+const validatePassword = (password) => {
+  const errors = [];
+  if (password.length < 8) errors.push("at least 8 characters");
+  if (!/[A-Z]/.test(password)) errors.push("one uppercase letter");
+  if (!/[a-z]/.test(password)) errors.push("one lowercase letter");
+  if (!/\d/.test(password)) errors.push("one number");
+  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(password)) errors.push("one special character");
+  
+  if (errors.length > 0) {
+    return `Password must contain ${errors.join(", ")}.`;
+  }
+  return null;
+};
+
+const validatePhone = (phone) => {
+  const phoneRegex = /^[6-9]\d{9}$/;
+  if (!phoneRegex.test(phone.replace(/[\s-]/g, ''))) {
+    return "Mobile number must be exactly 10 digits and start with 6, 7, 8, or 9.";
+  }
+  return null;
+};
+
+const validateEmail = (email) => {
+  const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+  if (!emailRegex.test(email)) {
+    return "Invalid email address format.";
+  }
+  return null;
+};
+
+const validateName = (name) => {
+  if (!/^[A-Za-z\s]{2,50}$/.test(name)) {
+    return "Name must be 2-50 characters and contain only letters and spaces.";
+  }
+  return null;
+};
+
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -21,6 +58,35 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    const nameError = validateName(name);
+    if (nameError) {
+      setError(nameError);
+      setLoading(false);
+      return;
+    }
+
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setError(emailError);
+      setLoading(false);
+      return;
+    }
+
+    const phoneError = validatePhone(phone);
+    if (phoneError) {
+      setError(phoneError);
+      setLoading(false);
+      return;
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      setLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Passwords do not match. Please try again.');
       setLoading(false);

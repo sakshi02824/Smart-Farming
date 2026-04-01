@@ -10,6 +10,7 @@ import FarmingGuides from './pages/FarmingGuides';
 import Analytics from './pages/Analytics';
 import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -26,6 +27,9 @@ function App() {
             {/* Protected Routes */}
             <Route path="/weather" element={<ProtectedRoute><WeatherDashboard /></ProtectedRoute>} />
             <Route path="/recommend" element={<ProtectedRoute><CropRecommendation /></ProtectedRoute>} />
+            <Route path="/guides" element={<ProtectedRoute><FarmingGuides /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/guides" element={<ProtectedRoute><FarmingGuides /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
             
